@@ -1,0 +1,15 @@
+ansible==2.8.6
+ansible-tower-cli==3.3.7
+kafka-python==1.4.7
+lxml==4.4.1
+jenkinsapi==0.3.11
+jsnapy==1.3.2
+junos-eznc==2.3.0
+jxmlease==1.0.1
+lxml==4.4.1
+napalm==2.5.0
+napalm-yang==0.1.0
+python-jenkins==1.5.0
+regex==2019.11.1
+requests==2.22.0
+xmltodict==0.12.0

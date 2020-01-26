@@ -1,0 +1,81 @@
+configuration:
+  protocols:
+    bgp:
+      group:
+        - name: POD1_UNDERLAY_TO_POD1_SERVICE_NODES
+          bfd_liveness_detection:
+            minimum_interval: '1000'
+            multiplier: '2'
+            session_mode: multihop
+          export: POLICY_EBGP_EXPORT
+          family:
+            inet:
+              unicast: null
+            inet_vpn:
+              any: null
+          log_updown: null
+          multipath: null
+          neighbor:
+            - description: POD1_SERVICE_NODE_01
+              name: 10.1.1.0
+            - description: POD1_SERVICE_NODE_02
+              name: 10.1.2.0
+          peer_as: '65000.1'
+          type: external
+        - name: POD1_OVERLAY_TO_POD1_LEAFS
+          bfd_liveness_detection:
+            minimum_interval: '1000'
+            multiplier: '2'
+            session_mode: multihop
+          cluster: 0.0.0.1
+          export: POLICY_NEXT_HOP_SELF
+          family:
+            evpn:
+              signaling: null
+            inet:
+              unicast: null
+          local_address: 192.168.255.5
+          log_updown: null
+          multipath: null
+          neighbor:
+            - description: POD1_LEAF_01
+              name: 192.168.255.7
+            - description: POD1_LEAF_02
+              name: 192.168.255.8
+          type: internal
+        - name: POD1_ROUTE_REFLECTORS
+          bfd_liveness_detection:
+            minimum_interval: '1000'
+            multiplier: '2'
+            session_mode: multihop
+          export: POLICY_NEXT_HOP_SELF
+          family:
+            evpn:
+              signaling: null
+          local_address: 192.168.255.5
+          log_updown: null
+          multipath: null
+          neighbor:
+            description: pod1-spine2
+            name: 192.168.255.6
+          type: internal
+        - name: POD1_OVERLAY_TO_POD1_SERVICE_NODES
+          bfd_liveness_detection:
+            minimum_interval: '1000'
+            multiplier: '2'
+            session_mode: multihop
+          family:
+            evpn:
+              signaling: null
+          local_address: 192.168.255.5
+          log_updown: null
+          multihop:
+            no_nexthop_change: null
+          multipath: null
+          neighbor:
+            - description: POD1_SERVICE_NODE_01
+              name: 192.168.255.3
+            - description: POD1_SERVICE_NODE_02
+              name: 192.168.255.4
+          peer_as: '65000.1'
+          type: external

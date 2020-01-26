@@ -1,0 +1,67 @@
+configuration:
+  protocols:
+    bgp:
+      group:
+      - advertise_inactive: null
+        bfd_liveness_detection:
+          minimum_interval: '2000'
+          multiplier: '3'
+          session_mode: multihop
+        cluster: 0.0.0.1
+        family:
+          evpn:
+            signaling: null
+          inet:
+            unicast: null
+          inet_vpn:
+            unicast: null
+        local_address: 192.168.255.102
+        log_updown: null
+        multipath: null
+        name: DC_ROUTE_REFLECTORS
+        neighbor:
+        - description: dc-bb-01
+          name: 192.168.255.1
+        - description: dc-bb-02
+          name: 192.168.255.2
+        - description: pod1-servicenode1
+          name: 192.168.255.3
+        - description: pod1-servicenode2
+          name: 192.168.255.4
+        type: internal
+      - advertise_inactive: null
+        bfd_liveness_detection:
+          minimum_interval: '2000'
+          multiplier: '3'
+          session_mode: multihop
+        family:
+          evpn:
+            signaling: null
+          inet:
+            unicast: null
+          inet_vpn:
+            unicast: null
+        local_address: 192.168.255.102
+        log_updown: null
+        multipath: null
+        name: PEER_ROUTE_REFLECTOR
+        neighbor:
+          description: dc-rr-01
+          name: 192.168.255.101
+        type: internal
+    isis:
+      apply_groups: GLOBAL_ISIS_DEFAULTS
+      interface:
+      - name: ae1.0
+      - name: ae3.0
+      - disable: null
+        name: em0.0
+      - name: lo0.0
+        passive: null
+    lldp:
+      interface:
+        name: all
+      port_id_subtype: interface-name
+    lldp_med:
+      interface:
+        name: all

@@ -1,0 +1,14 @@
+---
+- hosts: k8s
+  become: True
+  connection: local
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+    #  - "{{ lookup('env', 'ROOT_DIR') | default('/ansible') }}/shared/variables.yml"
+
+  roles:
+    - geerlingguy.security
+    - geerlingguy.swap
+    - geerlingguy.docker
+    - geerlingguy.kubernetes

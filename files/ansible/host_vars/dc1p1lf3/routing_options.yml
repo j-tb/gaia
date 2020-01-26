@@ -1,0 +1,9 @@
+configuration:
+  routing_options:
+    autonomous_system:
+      as_number: '65000.101'
+      asdot_notation: null
+    forwarding_table:
+      ecmp_fast_reroute: null
+      export: LOAD_BALANCE
+    router_id: 192.168.255.9

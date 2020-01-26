@@ -1,0 +1,37 @@
+tests_include:
+  - check_vc_member
+  - check_vc_port
+  - check_vcports_stats
+
+### ---------------------------------------------------------------------------------
+### Check that All VC members are Online
+### Check that all VCP ports are Up
+### Check CRC drop and errors on all VCP ports 
+### ---------------------------------------------------------------------------------
+check_vc_member:
+    - command: show virtual-chassis status
+    - iterate:
+        xpath: //member-list/member
+        tests:
+          - is-equal: member-status, Prsnt
+            err: VC member {{ post['member-id']}} is in state {{ post['member-status'] }}
+
+check_vc_port:
+    - command: show virtual-chassis vc-port all-members
+    - iterate:
+        xpath: //virtual-chassis-port-information/port-list/port-information
+        tests:
+          - is-equal: port-status, Up
+            err: VCP Interface {{ post['../../../re-name'] }} / {{ post['port-name'] }} is not UP
+
+check_vcports_stats:
+    - command:  show virtual-chassis vc-port statistics extensive all-members
+    - iterate:
+        xpath: //statistics-port-list/statistics
+        tests:
+          - is-equal: crc-align-errors, 0 
+            err: Port {{ post['../../../re-name'] }} - {{ post['port-name'] }} has CRC errors
+
+          - is-equal: interface-tx-errors, 0
+            err: Port {{ post['../../../re-name'] }} - {{ post['port-name'] }} has TX errors
+

@@ -1,0 +1,46 @@
+configuration:
+  protocols:
+    bgp:
+      group:
+        bfd_liveness_detection:
+          minimum_interval: '1000'
+          multiplier: '2'
+          session_mode: multihop
+        family:
+          evpn:
+            signaling: null
+          inet:
+            unicast: null
+        local_address: 192.168.255.9
+        log_updown: null
+        multipath: null
+        name: POD1_OVERLAY_TO_POD1_SPINES
+        neighbor:
+        - description: POD1_SPINE1
+          name: 192.168.255.5
+        - description: POD1_SPINE2
+          name: 192.168.255.6
+        type: internal
+    evpn:
+      encapsulation: vxlan
+      extended_vni_list: all
+    igmp_snooping:
+      vlan:
+      - name: default
+      - name: all
+    isis:
+      apply_groups: GLOBAL_ISIS_DEFAULTS
+      interface:
+      - name: ae4.0
+      - name: ae5.0
+      - name: lo0.0
+        passive: null
+    lldp:
+      interface:
+      - name: all
+      - disable: null
+        name: em0
+      port_id_subtype: interface-name
+    lldp_med:
+      interface:
+        name: all

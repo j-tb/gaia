@@ -1,0 +1,29 @@
+{
+  "name": "string",
+  "device_type": 0,
+  "device_role": 0,
+  "tenant": 0,
+  "platform": 0,
+  "serial": "string",
+  "asset_tag": "string",
+  "site": 0,
+  "rack": 0,
+  "position": 0,
+  "face": 0,
+  "parent_device": {
+    "name": "string"
+  },
+  "status": 1,
+  "primary_ip4": 0,
+  "primary_ip6": 0,
+  "cluster": 0,
+  "virtual_chassis": 0,
+  "vc_position": 0,
+  "vc_priority": 0,
+  "comments": "string",
+  "local_context_data": "string",
+  "tags": [
+    "string"
+  ],
+  "custom_fields": {}
+}

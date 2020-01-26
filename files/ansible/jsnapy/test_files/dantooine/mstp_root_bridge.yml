@@ -1,0 +1,29 @@
+tests_include:
+  - check_root_id
+
+### ---------------------------------------------------------------------------------
+### Check spanning-tree bridge information 
+### ---------------------------------------------------------------------------------
+check_root_id:
+  - rpc: get-stp-bridge-information
+
+  - iterate:
+      xpath: '//stp-bridge/cist-bridge-parameters'
+      tests:
+        - is-equal: root-bridge/bridge-mac, d0:dd:49:76:7a:91
+          err: root-bridge/bridge-mac {{post['bridge-mac']}} (d0:dd:49:76:7a:91 expected)
+
+        - is-equal: root-port, ge-0/0/0
+          err: root-port {{post['root-port']}} (ge-0/0/0 expected)
+
+        - is-equal: this-bridge/bridge-priority, 32768
+          err: this-bridge/bridge-priority {{post['this-bridge/bridge-priority']}} (32768 expected)
+
+  - iterate:
+      xpath: '//stp-bridge/msti-bridge-parameters'
+      tests:
+        - is-equal: msti-regional-root-bridge/bridge-mac, d0:dd:49:76:7a:91
+          err: msti-regional-root-bridge/bridge-mac {{post['msti-regional-root-bridge/bridge-mac']}} (d0:dd:49:76:7a:91 expected)
+
+        - is-equal: this-bridge/bridge-priority, 32769
+          err: this-bridge/bridge-priority {{post['this-bridge/bridge-priority']}} (32768 expected)

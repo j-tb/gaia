@@ -1,0 +1,66 @@
+configuration:
+  interfaces:
+    apply_groups: GLOBAL_MTU_DEFAULTS
+    interface:
+      - description: 'BACKBONE2_RR1 (Member Of: ae4)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae1
+        name: xe-0/0/1
+      - description: 'BACKBONE1_RR1 (Member Of: ae3)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae3
+        name: xe-0/0/3
+      - aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: BACKBONE1_RR1
+        name: ae1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.0.1.5/31
+            iso: null
+            mpls: null
+          name: '0'
+      - aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: BACKBONE2_RR1
+        name: ae3
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.0.2.5/31
+            iso: null
+            mpls: null
+          name: '0'
+      - name: em0
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.255.1.41/17
+          name: '0'
+      - name: em1
+        unit:
+          family:
+            inet:
+              address:
+                name: 169.254.0.2/24
+          name: '0'
+      - name: lo0
+        unit:
+          family:
+            inet:
+              address:
+                name: 192.168.255.101/32
+            iso:
+              address:
+                name: 49.0192.0168.0255.0101.00
+          name: '0'

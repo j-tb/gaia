@@ -1,0 +1,31 @@
+---
+- name: debug host variables
+  hosts: all
+  gather_facts: yes
+  connection: local
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+    #  - "{{ lookup('env', 'ROOT_DIR') | default('/ansible') }}/shared/variables.yml"
+  tasks:
+    ### -------------------------------------------------
+    ### print out ansible goodies
+    ### -------------------------------------------------
+    - name: debug ansible_os_family
+      debug:
+        var: ansible_os_family
+
+    - name: debug ansible_python_interpreter
+      debug:
+        var: ansible_python_interpreter
+
+    ### -------------------------------------------------
+    ### print out hostvars
+    ### -------------------------------------------------
+    # - name: debug hostvars
+    #   debug:
+    #     var: hostvars
+
+    - name: "Ansible | List all known variables and facts"
+      debug:
+        var: hostvars[inventory_hostname]

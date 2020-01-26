@@ -1,0 +1,23 @@
+tests_include:
+  - check_root_id
+
+### ---------------------------------------------------------------------------------
+### Check spanning-tree bridge information 
+### ---------------------------------------------------------------------------------
+check_root_id:
+  - rpc: get-stp-bridge-information
+
+  - iterate:
+      xpath: '//stp-bridge/cist-bridge-parameters'
+      tests:
+        - is-equal: this-bridge/bridge-mac, d0:dd:49:76:7a:91
+          err: this-bridge/bridge-mac {{post['bridge-mac']}} (d0:dd:49:76:7a:91 expected)
+
+        - is-equal: internal-root-cost, 0
+          err: internal-root-cost {{post['internal-root-cost']}} (0 expected)
+
+  - iterate:
+      xpath: '//stp-bridge/msti-bridge-parameters'
+      tests:
+        - is-equal: this-bridge/bridge-mac, d0:dd:49:76:7a:91
+          err: this-bridge/bridge-mac {{post['bridge-mac']}} (d0:dd:49:76:7a:91 expected)

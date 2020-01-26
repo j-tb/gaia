@@ -1,0 +1,88 @@
+---
+### ---------------------------------------------------------------------------
+### VALIDATE THAT ANSIBLE CONTROL MACHINE IS RUNNING A RECENT ANSIBLE VERSION
+### ---------------------------------------------------------------------------
+- hosts: leaf, spine, servicenode, backbone, routereflector
+  connection: local
+  gather_facts: False
+  become: False
+  tasks:
+    - name: "Check ansible version >=2.7.8"
+      assert:
+        msg: "Ansible must be v2.7.8 or higher"
+        that:
+          - ansible_version.string is version("2.7.8", ">=")
+      tags:
+        - check
+  run_once: True
+
+### ---------------------------------------------------------------------------
+### REMOVE AND RECREATE BUILD DIRECTORIES
+### ---------------------------------------------------------------------------
+- hosts: leaf, spine, servicenode, backbone, routereflector
+  connection: local
+  gather_facts: False
+  vars_files:
+    - "shared/variables.yml"
+  roles:
+    - { role: localhost-build-dirs, tags: ["always"] }
+
+### ---------------------------------------------------------------------------
+### BUILD CONFIGURATION IN PIECES AND ASSEMBLE INTO SINGLE CONFIG FILE
+### ---------------------------------------------------------------------------
+- hosts: leaf, spine, servicenode, backbone, routereflector
+  connection: local
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  gather_facts: False
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - { role: juniper_stanza_version }
+    - { role: juniper_stanza_apply_groups }
+    - { role: juniper_stanza_groups }
+    - { role: juniper_stanza_system }
+    - { role: juniper_stanza_chassis }
+    - {
+        role: juniper_stanza_services,
+        tags: "firewall",
+        when: "'firewall' in device.role",
+      }
+    - {
+        role: juniper_stanza_security,
+        tags: "firewall",
+        when: "'firewall' in device.role",
+      }
+    - { role: juniper_stanza_interfaces }
+    - { role: juniper_stanza_snmp }
+    - { role: juniper_stanza_forwarding_options }
+    - { role: juniper_stanza_routing_instances }
+    - { role: juniper_stanza_routing_options }
+    - { role: juniper_stanza_protocols }
+    - { role: juniper_stanza_policy_options }
+    - { role: juniper_stanza_class_of_service }
+    - { role: juniper_stanza_firewall }
+    - { role: juniper_stanza_switch_options }
+    - { role: juniper_stanza_poe }
+    - {
+        role: juniper_stanza_virtual_chassis,
+        tags: "vc",
+        when: "'virtual_chassis' in device.role",
+      }
+    - { role: juniper_stanza_access }
+    - { role: juniper_stanza_vlans }
+    - { role: juniper_assemble_config }
+
+### ---------------------------------------------------------------------------
+### VALIDATE, DIFF, AND APPLY CONFIGURATION TO DEVICES
+### ---------------------------------------------------------------------------
+- hosts: leaf, spine, servicenode, backbone, routereflector
+  connection: local
+  gather_facts: False
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - { role: juniper_configuration_diff }
+    - { role: juniper_configuration_check }
+    - { role: juniper_configuration_apply }

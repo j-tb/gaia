@@ -1,0 +1,39 @@
+tests_include:
+  - check_bgp_139_65_224_15
+  # - check_bgp_139_65_224_1
+  # - check_bgp_139_65_224_2
+
+
+### ---------------------------------------------------------------------------------
+### Assert BGP adjacency is up with HOU150-PE1 
+### ---------------------------------------------------------------------------------
+check_bgp_139_65_224_15:
+  - command: show bgp neighbor 139.65.224.15
+
+  - item:
+      xpath: '//bgp-information/bgp-peer'
+      tests:
+        - is-equal: peer-state, Established
+          err: Neighbor 139.65.224.15 in group {{post['peer-group']}} is in {{post['peer-state']}} State (Established expected)
+
+### ---------------------------------------------------------------------------------
+### Assert the BGP sessions to route reflectors are up and operational 
+### ---------------------------------------------------------------------------------
+check_bgp_139_65_224_1:
+  - command: show bgp neighbor 139.65.224.1
+
+  - item:
+      xpath: '//bgp-information/bgp-peer'
+      tests:
+        - is-equal: peer-state, Established
+          err: Neighbor 139.65.224.1 in group {{post['peer-group']}} is in {{post['peer-state']}} State (Established expected)
+
+check_bgp_139_65_224_2:
+  - command: show bgp neighbor 139.65.224.2
+
+  - item:
+      xpath: '//bgp-information/bgp-peer'
+      tests:
+        - is-equal: peer-state, Established
+          err: Neighbor 139.65.224.2 in group {{post['peer-group']}} is in {{post['peer-state']}} State (Established expected)
+

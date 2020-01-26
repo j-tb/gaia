@@ -1,0 +1,40 @@
+---
+all:
+  vars:
+    backup_directory: ./backup/{{ inventory_hostname }}
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+  children:
+    leaf:
+      hosts:
+        dc1p1lf1:
+          ansible_host: "10.255.1.21"
+        dc1p1lf2:
+          ansible_host: "10.255.1.22"
+        dc1p1lf3:
+          ansible_host: "10.255.1.25"
+        dc1p1lf4:
+          ansible_host: "10.255.1.26"
+    spine:
+      hosts:
+        dc1p1sp1:
+          ansible_host: "10.255.1.27"
+        dc1p1sp2:
+          ansible_host: "10.255.1.28"
+    servicenode:
+      hosts:
+        dc1p1sn1:
+          ansible_host: "10.255.1.35"
+        dc1p1sn2:
+          ansible_host: "10.255.1.36"
+    backbone:
+      hosts:
+        dc1bb1:
+          ansible_host: "10.255.1.33"
+        dc1bb2:
+          ansible_host: "10.255.1.34"
+    routereflector:
+      hosts:
+        dc1rr1:
+          ansible_host: "10.255.1.41"
+        dc1rr2:
+          ansible_host: "10.255.1.42"

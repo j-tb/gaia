@@ -1,0 +1,332 @@
+#jinja2: lstrip_blocks: "True (or False)", trim_blocks: "True (or False)"
+{#- ---------------------------------------------------------------------------------- #}
+{# policy-options                                                                      #}
+{# ---------------------------------------------------------------------------------- -#}
+{% if configuration.policy_options is defined %}
+policy-options {
+    {# ----------------------------------------------- #}
+    {# policy-options.prefix-lists                     #}
+    {# ----------------------------------------------- #}
+    {% if configuration.policy_options.comment is defined %}
+    {{ configuration.policy_options.comment }};
+    {% endif %}
+    {# ----------------------------------------------- #}
+    {# policy-options.prefix-lists                     #}
+    {# ----------------------------------------------- #}
+    {% if configuration.policy_options.prefix_list is defined %}
+    {% if configuration.policy_options.prefix_list is not mapping and configuration.policy_options.prefix_list is not string %}
+    {% for each in configuration.policy_options.prefix_list %}
+    prefix-list {{ each.name }} {
+        {% if each.prefix_list_item is defined %}
+        {% if each.prefix_list_item is not mapping and each.prefix_list_item is not string %}
+        {% for item in each.prefix_list_item %}
+        {{ item.name }};
+        {% endfor %}
+        {% else %}
+        {{ each.prefix_list_item.name }};
+        {% endif %}
+        {% endif %}
+        {% if each.apply_path is defined %}
+        apply-path "{{ each.apply_path }}";
+        {% endif %}
+    }
+    {% endfor %}
+    {% else %}
+    prefix-list {{ configuration.policy_options.prefix_list.name }} {
+        {% if configuration.policy_options.prefix_list.prefix_list_item is defined %}
+        {% if configuration.policy_options.prefix_list.prefix_list_item is not mapping and configuration.policy_options.prefix_list.prefix_list_item is not string %}
+        {% for item in configuration.policy_options.prefix_list.prefix_list_item %}
+        {{ item.name }};
+        {% endfor %}
+        {% else %}
+        {{ configuration.policy_options.prefix_list.prefix_list_item.name }}
+        {% endif %}
+        {% endif %}
+        {% if configuration.policy_options.prefix_list.apply_path is defined %}
+        apply-path "{{ configuration.policy_options.prefix_list.apply_path }}";
+        {% endif %}
+    }
+    {% endif %}
+    {% endif %}
+    {# ----------------------------------------------- #}
+    {# policy-options.policy-statements                #}
+    {# ----------------------------------------------- #}
+    {% if configuration.policy_options.policy_statement is defined %}
+    {# ----------------------------------------------- #}
+    {# multiple policy-options.policy-statements       #}
+    {# ----------------------------------------------- #}
+    {% if configuration.policy_options.policy_statement is not mapping and configuration.policy_options.policy_statement is not string %}
+    {% for each in configuration.policy_options.policy_statement %}
+    policy-statement {{ each.name }} {
+        {% if each.term is defined %}
+        term {{ each.term.name }} {
+            {% if each.term.from is defined %}
+            {# ----------------------------------------------- #}
+            {# catch those with multiple keys in the from term #}
+            {# ----------------------------------------------- #}
+            from {
+                {% if each.term.from.route_filter is defined %}
+                {% if each.term.from.route_filter is not mapping and each.term.from.route_filter is not string %}
+                {% for item in each.term.from.route_filter %}
+                {% if item.exact is defined %}
+                route-filter {{ item.address }} exact;
+                {% else %}
+                route-filter {{ item.address }}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                {% if each.term.from.route_filter.exact is defined %}
+                route-filter {{ each.term.from.route_filter.address }} exact;
+                {% else %}
+                route-filter {{ each.term.from.route_filter.address }}
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                {% if each.term.from.community is defined %}
+                {% if each.term.from.community is not mapping and each.term.from.community is not string %}
+                community [ {{ each.term.from.community|join(' ') }} ];
+                {% else %}
+                community {{ each.term.from.community }};
+                {% endif %}
+                {% endif %}
+                {# ----------------------------------------------- #}
+                {# policy-options.policy-statements.term.from.rib  #}
+                {# ----------------------------------------------- #}
+                {% if each.term.from.rib is defined %}
+                {% if each.term.from.rib is not mapping and each.term.from.rib is not string %}
+                rib [ {{ each.term.from.rib|join(' ') }} ];
+                {% else %}
+                rib {{ each.term.from.rib }};
+                {% endif %}
+                {% endif %}
+                {# ------------------------------------------------------ #}
+                {# policy-options.policy-statements.term.from.route_type  #}
+                {# ------------------------------------------------------ #}
+                {% if each.term.from.route_type is defined %}
+                {% if each.term.from.route_type is not mapping and each.term.from.route_type is not string %}
+                route-type [ {{ each.term.from.route_type|join(' ') }} ];
+                {% else %}
+                route-type {{ each.term.from.route_type }};
+                {% endif %}
+                {% endif %}
+            }
+            {% endif %}
+            {# ------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then             #}
+            {# ------------------------------------------------------ #}
+            {% if each.term.then is defined %}
+            {# ------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then.accept      #}
+            {# ------------------------------------------------------ #}
+            {% if each.term.then.accept is defined %}
+            {# ----------------------------------------------------------- #}
+            {# policy-options.policy-statements.term.then.accept.community #}
+            {# ----------------------------------------------------------- #}
+            {% if each.term.then.community is defined %}
+            then {
+                {% if each.term.then.community is not mapping and each.term.then.community is not string %}
+                {% for item in each.term.then.community %}
+                community add {{ item.community_name }};
+                {% endfor %}
+                {% endif %}
+                accept;
+            }
+            {% else %}
+            then accept;
+            {% endif %}
+            {# ------------------------------------------------------- #}
+            {# policy-options.policy-statements.term.then.discard      #}
+            {# ------------------------------------------------------- #}
+            {% elif each.term.then.discard is defined %}
+            then discard;
+            {# ------------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then.load_balance      #}
+            {# ------------------------------------------------------------ #}
+            {% elif each.term.then.load_balance is defined %}
+            then {
+                load-balance per-packet;
+            }
+            {# ------------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then.next_hop          #}
+            {# ------------------------------------------------------------ #}
+            {% elif each.term.then.next_hop is defined %}
+            then {
+                {% if each.term.then.next_hop.self is defined %}
+                next-hop self;
+                {% endif %}
+            }
+            {% endif %}
+            {% endif %}
+        }
+        {% else %}
+        {# ------------------------------------------------------------ #}
+        {# policy-options.policy-statements.from                        #}
+        {# ------------------------------------------------------------ #}
+        {% if each.from is defined %}
+        from {
+            {% if each.from.prefix_list is defined %}
+            prefix-list {{ each.from.prefix_list.name }};
+            {% endif %}
+        }
+        {% endif %}
+        {# ------------------------------------------------------------ #}
+        {# policy-options.policy-statements.then                        #}
+        {# ------------------------------------------------------------ #}
+        {% if each.then is defined %}
+        {% if each.then.accept is defined %}
+        then accept;
+        {% else %}
+        then {
+            {% if each.then.load_balance is defined %}
+            load-balance per-packet;
+            {% endif %}
+        }
+        {% endif %}
+        {% endif %}
+        {% endif %}
+    }
+    {% endfor %}
+    {# ----------------------------------------------- #}
+    {# single policy-options.policy-statements         #}
+    {# ----------------------------------------------- #}
+    {% else %}
+    policy-statement {{ configuration.policy_options.policy_statement.name }} {
+        {% if configuration.policy_options.policy_statement.term is defined %}
+        term {{ configuration.policy_options.policy_statement.term.name }} {
+            {% if configuration.policy_options.policy_statement.term.from is defined %}
+            from {
+                {% if configuration.policy_options.policy_statement.term.from.route_filter is defined %}
+                {% if configuration.policy_options.policy_statement.term.from.route_filter is not mapping and configuration.policy_options.policy_statement.term.from.route_filter is not string %}
+                {% for item in configuration.policy_options.policy_statement.term.from.route_filter %}
+                {% if item.exact is defined %}
+                route-filter {{ item.address }} exact;
+                {% else %}
+                route-filter {{ item.address }}
+                {% endif %}
+                {% endfor %}
+                {% else %}
+                {% if configuration.policy_options.policy_statement.term.from.route_filter.exact is defined %}
+                route-filter {{ configuration.policy_options.policy_statement.term.from.route_filter.address }} exact;
+                {% else %}
+                route-filter {{ configuration.policy_options.policy_statement.term.from.route_filter.address }}
+                {% endif %}
+                {% endif %}
+                {% endif %}
+                {% if configuration.policy_options.policy_statement.term.from.community is defined %}
+                {% if configuration.policy_options.policy_statement.term.from.community is not mapping and configuration.policy_options.policy_statement.term.from.community is not string %}
+                community [ {{ configuration.policy_options.policy_statement.term.from.community|join(' ') }} ];
+                {% else %}
+                community {{ configuration.policy_options.policy_statement.term.from.community }};
+                {% endif %}
+                {% endif %}
+                {# ----------------------------------------------- #}
+                {# policy-options.policy-statements.term.from.rib  #}
+                {# ----------------------------------------------- #}
+                {% if configuration.policy_options.policy_statement.term.from.rib is defined %}
+                {% if configuration.policy_options.policy_statement.term.from.rib is not mapping and configuration.policy_options.policy_statement.term.from.rib is not string %}
+                rib [ {{ configuration.policy_options.policy_statement.term.from.rib|join(' ') }} ];
+                {% else %}
+                rib {{ configuration.policy_options.policy_statement.term.from.rib }};
+                {% endif %}
+                {% endif %}
+                {# ------------------------------------------------------ #}
+                {# policy-options.policy-statements.term.from.route_type  #}
+                {# ------------------------------------------------------ #}
+                {% if configuration.policy_options.policy_statement.term.from.route_type is defined %}
+                {% if configuration.policy_options.policy_statement.term.from.route_type is not mapping and configuration.policy_options.policy_statement.term.from.route_type is not string %}
+                route-type [ {{ configuration.policy_options.policy_statement.term.from.route_type|join(' ') }} ];
+                {% else %}
+                route-type {{ configuration.policy_options.policy_statement.term.from.route_type }};
+                {% endif %}
+                {% endif %}
+            }
+            {% endif %}
+            {# ------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then             #}
+            {# ------------------------------------------------------ #}
+            {% if configuration.policy_options.policy_statement.term.then is defined %}
+            {# ------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then.accept      #}
+            {# ------------------------------------------------------ #}
+            {% if configuration.policy_options.policy_statement.term.then.accept is defined %}
+            {# ----------------------------------------------------------- #}
+            {# policy-options.policy-statements.term.then.accept.community #}
+            {# ----------------------------------------------------------- #}
+            {% if configuration.policy_options.policy_statement.term.then.community is defined %}
+            then {
+                {% if configuration.policy_options.policy_statement.term.then.community is not mapping and configuration.policy_options.policy_statement.term.then.community is not string %}
+                {% for item in configuration.policy_options.policy_statement.term.then.community %}
+                community add {{ item.community_name }};
+                {% endfor %}
+                {% endif %}
+                accept;
+            }
+            {% else %}
+            then accept;
+            {% endif %}
+            {# ------------------------------------------------------- #}
+            {# policy-options.policy-statements.term.then.discard      #}
+            {# ------------------------------------------------------- #}
+            {% elif configuration.policy_options.policy_statement.term.then.discard is defined %}
+            then discard;
+            {# ------------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then.load_balance      #}
+            {# ------------------------------------------------------------ #}
+            {% elif configuration.policy_options.policy_statement.term.then.load_balance is defined %}
+            then {
+                load-balance per-packet;
+            }
+            {# ------------------------------------------------------------ #}
+            {# policy-options.policy-statements.term.then.next_hop          #}
+            {# ------------------------------------------------------------ #}
+            {% elif configuration.policy_options.policy_statement.term.then.next_hop is defined %}
+            then {
+                {% if configuration.policy_options.policy_statement.term.then.next_hop.self is defined %}
+                next-hop self;
+                {% endif %}
+            }
+            {% endif %}
+            {% endif %}
+        }
+        {% else %}
+        {# ------------------------------------------------------------ #}
+        {# policy-options.policy-statements.from                        #}
+        {# ------------------------------------------------------------ #}
+        {% if configuration.policy_options.policy_statement.from is defined %}
+        from {
+            {% if configuration.policy_options.policy_statement.from.prefix_list is defined %}
+            prefix-list {{ configuration.policy_options.policy_statement.from.prefix_list.name }};
+            {% endif %}
+        }
+        {% endif %}
+        {# ------------------------------------------------------------ #}
+        {# policy-options.policy-statements.then                        #}
+        {# ------------------------------------------------------------ #}
+        {% if configuration.policy_options.policy_statement.then is defined %}
+        then {
+            {% if configuration.policy_options.policy_statement.then.load_balance is defined %}
+            load-balance per-packet;
+            {% endif %}
+            {% if configuration.policy_options.policy_statement.then.accept is defined %}
+            accept;
+            {% endif %}
+        }
+        {% endif %}
+        {% endif %}
+    }
+    {% endif %}
+    {% endif %}
+    {# ------------------------------------------------------------ #}
+    {# policy-options.policy-statements.then                        #}
+    {# ------------------------------------------------------------ #}
+    {% if configuration.policy_options.community is defined %}
+    {% if configuration.policy_options.community is not mapping and configuration.policy_options.community is not string %}
+    {% for each in configuration.policy_options.community %}
+    community {{ each.name }} members {{ each.members }};
+    {% endfor %}
+    {% else %}
+    community {{ configuration.policy_options.community.name }} members {{ configuration.policy_options.community.members }};
+    {% endif %}
+    {% endif %}
+}
+{% endif %}

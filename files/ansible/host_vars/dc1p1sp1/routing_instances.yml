@@ -1,0 +1,20 @@
+configuration:
+  routing_instances:
+    instance:
+      instance_type: vrf
+      interface:
+        - name: irb.1046
+        - name: irb.1047
+        - name: irb.1048
+        - name: lo0.2
+      name: VRF02
+      route_distinguisher:
+        rd_type: 172.16.20.1:2
+      routing_options:
+        autonomous_system:
+          as_number: '200.2'
+          loops: '2'
+        multipath: null
+      vrf_export: VRF02_EXPORT
+      vrf_import: VRF02_IMPORT
+      vrf_table_label: null

@@ -1,0 +1,27 @@
+---
+- name: "### Update Ansible username ###"
+  hosts: all
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - juniper.junos
+  connection: local
+  gather_facts: no
+  tasks:
+    ### -------------------------------------------------
+    ### GET INTERFACE INFORMATION
+    ### -------------------------------------------------
+    - name: Get interface information
+      juniper_junos_rpc:
+        host: "{{ inventory_hostname }}"
+        # user: "{{ provider_info.user }}"
+        # passwd: "{{ provider_info.passwd }}"
+        rpc: get-interface-information
+        kwargs:
+          extensive: True
+      register: junos
+
+    - name: debug
+      debug:
+        var: junos

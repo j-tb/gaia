@@ -1,0 +1,165 @@
+configuration:
+  interfaces:
+    apply_groups: GLOBAL_MTU_DEFAULTS
+    interface:
+      - name: xe-0/0/0
+        description: 'POD1_SPINE1_LEAF1 (Member Of: ae0)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae0
+      - name: xe-0/0/1
+        description: 'POD1_SERVICENODE1_SPINE1 (Member Of: ae1)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae1
+      - name: xe-0/0/2
+        description: 'POD1_SPINE1_LEAF2 (Member Of: ae2)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae2
+      - name: xe-0/0/3
+        description: 'POD1_SERVICENODE2_SPINE1 (Member Of: ae3)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae3
+      - name: xe-0/0/4
+        description: 'POD1_SPINE1_LEAF3 (Member Of: ae4)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae4
+      - name: xe-0/0/5
+        description: 'POD1_SPINE1_LEAF4 (Member Of: ae5)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae5
+      - name: ae0
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SPINE1_LEAF1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.2.1.0/31
+            iso: null
+          name: '0'
+      - name: ae1
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SERVICENODE1_SPINE1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.1.1.1/31
+            mpls: null
+          name: '0'
+      - name: ae2
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SPINE1_LEAF2
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.2.1.2/31
+            iso: null
+          name: '0'
+      - name: ae3
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SERVICENODE2_SPINE1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.1.2.1/31
+            mpls: null
+          name: '0'
+      - name: ae4
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SPINE1_LEAF3
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.2.1.4/31
+            iso: null
+          name: '0'
+      - name: ae5
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SPINE1_LEAF4
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.2.1.6/31
+            iso: null
+          name: '0'
+      - name: em0
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.255.1.27/17
+          name: '0'
+      - name: em1
+        unit:
+          family:
+            inet:
+              address:
+                name: 169.254.0.2/24
+          name: '0'
+      - name: irb
+        apply_groups: IRB_OPTIONS
+        unit:
+          - description: LINUX STORAGE VLAN
+            family:
+              inet:
+                address:
+                  name: 10.100.4.2/23
+                  virtual_gateway_address: 10.100.4.1
+            name: '1046'
+          - description: LINUX DATA VLAN
+            family:
+              inet:
+                address:
+                  name: 10.100.6.2/23
+                  virtual_gateway_address: 10.100.6.1
+            name: '1047'
+          - description: LINUX MGMT VLAN
+            family:
+              inet:
+                address:
+                  name: 10.10.48.12/23
+                  virtual_gateway_address: 10.10.48.1
+            name: '1048'
+      - name: lo0
+        unit:
+          - family:
+              inet:
+                address:
+                  name: 192.168.255.5/32
+              iso:
+                address:
+                  name: 49.0192.0168.0255.0005.00
+            name: '0'
+          - family:
+              inet:
+                address:
+                  name: 172.16.20.1/32
+            name: '2'

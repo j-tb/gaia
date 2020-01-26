@@ -1,0 +1,67 @@
+configuration:
+  protocols:
+    bgp:
+      group:
+        - name: OVERLAY_TO_DC_ROUTE_REFLECTORS
+          bfd_liveness_detection:
+            minimum_interval: '2000'
+            multiplier: '3'
+            session_mode: multihop
+          export: POLICY_NEXT_HOP_SELF
+          family:
+            evpn:
+              signaling: null
+            inet:
+              unicast: null
+            inet_vpn:
+              unicast: null
+          local_address: 192.168.255.3
+          log_updown: null
+          multipath: null
+          neighbor:
+            - description: DC_ROUTE_REFLECTOR_01
+              name: 192.168.255.101
+            - description: DC_ROUTE_REFLECTOR_02
+              name: 192.168.255.102
+          type: internal
+        - name: POD1_UNDERLAY_TO_POD1_SPINES
+          advertise_inactive: null
+          bfd_liveness_detection:
+            minimum_interval: '1000'
+            multiplier: '2'
+            session_mode: multihop
+          export: EBGP_EXPORT
+          family:
+            inet:
+              unicast: null
+            inet_vpn:
+              any: null
+          log_updown: null
+          multipath: null
+          neighbor:
+            - description: POD1-SPINE1
+              name: 10.1.1.1
+            - description: POD1-SPINE2
+              name: 10.1.1.3
+          peer_as: '65000.101'
+          type: external
+        - name: POD1_OVERLAY_TO_POD1_SPINES
+          bfd_liveness_detection:
+            minimum_interval: '1000'
+            multiplier: '2'
+            session_mode: multihop
+          family:
+            evpn:
+              signaling: null
+          local_address: 192.168.255.3
+          log_updown: null
+          multihop:
+            no_nexthop_change: null
+          multipath: null
+          neighbor:
+            - description: POD1-SPINE1
+              name: 192.168.255.5
+            - description: POD1-SPINE2
+              name: 192.168.255.6
+          peer_as: '65000.101'
+          type: external

@@ -1,0 +1,46 @@
+configuration:
+  policy_options:
+    community:
+      members: target:999:999
+      name: ESI
+    policy_statement:
+      - name: EBGP_EXPORT
+        term:
+          from:
+            route_filter:
+              - address: 192.168.255.4/32
+                exact: null
+          name: LOCAL_LOOPBACK
+          then:
+            accept: null
+      - name: EVPN_IMPORT
+        term:
+          from:
+            community: ESI
+          name: EVPN_ROUTES
+          then:
+            accept: null
+      - name: INTERFACE_IMPORT
+        term:
+          from:
+            route_filter:
+              - address: 10.1.1.0/31
+                exact: null
+              - address: 10.1.1.2/31
+                exact: null
+          name: POD1_UNDERLAY
+          then:
+            accept: null
+      - name: LOAD_BALANCE
+        then:
+          load_balance:
+            per_packet: null
+      - name: POLICY_NEXT_HOP_SELF
+        term:
+          from:
+            rib: inet.0
+            route_type: external
+          name: NHS
+          then:
+            next_hop:
+              self: null

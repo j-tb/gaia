@@ -1,0 +1,38 @@
+---
+- name: "### Update Ansible username ###"
+  hosts: pod1-leaf2
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - juniper.junos
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Get interface information
+      juniper_junos_rpc:
+        host: "{{ inventory_hostname }}"
+        user: "{{ provider_info.user }}"
+        ssh_private_key_file: "{{ provider_info.ssh_private_key_file }}"
+        rpc: get-interface-information
+        kwargs:
+          extensive: True
+      register: interfaces
+
+    - name: debug
+      debug:
+        var: interfaces
+
+    - name: set fact
+      set_fact:
+        interfaces: "{{ interfaces.parsed_output['interface-information']['physical-interface'] }}"
+
+    - name: pass to custom ansible module
+      broadcast_parser:
+        inventory_hostname: "{{ inventory_hostname }}"
+        interfaces: "{{ interfaces }}"
+      register: output
+
+    - name: debug
+      debug:
+        var: output

@@ -1,0 +1,13 @@
+---
+- name: BGP healthcheck with JSNAPy
+  hosts: all
+  gather_facts: no
+  connection: local
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  # vars_files:
+  #   - "{{ lookup('env', 'ROOT_DIR') | default('/ansible') }}/shared/variables.yml"
+  roles:
+    - juniper.junos
+    - juniper_jsnapy_bgp_adj

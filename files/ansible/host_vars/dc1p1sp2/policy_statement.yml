@@ -1,0 +1,69 @@
+configuration:
+  policy_options:
+    policy_statement:
+      - name: EVPN_IMPORT
+        term:
+          from:
+            community: ESI
+          name: EVPN_ROUTES
+          then:
+            accept: null
+      - name: INTERFACE_IMPORT
+        term:
+          from:
+            route_filter:
+            - address: 10.1.2.2/31
+              exact: null
+            - address: 10.1.1.2/31
+              exact: null
+          name: P2P_SPINE_SERVICENODE
+          then:
+            accept: null
+      - name: LOAD_BALANCE
+        then:
+          load_balance:
+            per_packet: null
+      - name: POLICY_EBGP_EXPORT
+        term:
+          from:
+            route_filter:
+            - address: 192.168.255.6/32
+              exact: null
+            - address: 192.168.255.7/32
+              exact: null
+            - address: 192.168.255.8/32
+              exact: null
+          name: POD1_LOOPBACKS
+          then:
+            accept: null
+      - name: POLICY_NEXT_HOP_SELF
+        term:
+          from:
+            rib: inet.0
+            route_type: external
+          name: NHS
+          then:
+            next_hop:
+              self: null
+      - name: VRF02_EXPORT
+        term:
+          name: '1'
+          then:
+            accept: null
+            community:
+            - add: null
+              community_name: VRF02_RT
+            - add: null
+              community_name: GEN_IP_VRF_RT
+            - add: null
+              community_name: TRUSTED_COMMUNITY
+      - name: VRF02_IMPORT
+        term:
+          from:
+            community:
+            - GEN_IP_VRF_RT
+            - VRF02_RT
+            - TRUSTED_COMMUNITY
+          name: '1'
+          then:
+            accept: null

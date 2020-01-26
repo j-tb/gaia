@@ -1,0 +1,35 @@
+configuration:
+  protocols:
+    evpn:
+      default_gateway: no-gateway-community
+      encapsulation: vxlan
+      extended_vni_list: all
+    isis:
+      apply_groups: GLOBAL_ISIS_DEFAULTS
+      interface:
+        - name: ae0.0
+        - name: ae2.0
+        - name: lo0.0
+          passive: null
+    ldp:
+      interface:
+        - name: all
+        - name: em0.0
+          disable: null
+      track_igp_metric: null
+    lldp:
+      interface:
+        - name: all
+        - name: em0
+          disable: null
+      port_id_subtype: interface-name
+    lldp_med:
+      interface:
+        - name: all
+        - name: em0
+          disable: null
+    mpls:
+      interface:
+        - name: all
+        - name: em0.0
+          disable: null

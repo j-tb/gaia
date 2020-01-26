@@ -1,0 +1,38 @@
+configuration:
+  policy_options:
+    prefix_list:
+      - name: PREFIX_TACACS_SERVERS
+        apply_path: system tacplus-server <*>
+      - name: PREFIX_LOCALHOST
+        prefix_list_item:
+          name: 127.0.0.0/8
+      - name: PREFIX_NTP_SERVERS
+        apply_path: system ntp server <*>
+      - name: PREFIX_DNS_SERVERS
+        apply_path: system name-server <*>
+      - name: PREFIX_SNMP_CLIENT_LISTS
+        apply_path: snmp client-list <*> <*>
+      - name: PREFIX_SNMP_COMMUNITY_CLIENTS
+        apply_path: snmp community <*> clients <*>
+      - name: PREFIX_BGP_NEIGHBORS
+        apply_path: protocols bgp group <*> neighbor <*>
+      - name: PREFIX_BGP_NEIGHBORS_ROUTING_INSTANCES
+        apply_path: routing-instances <*> protocols bgp group <*> neighbor <*>
+      - name: PREFIX_ROUTER_IPV4
+        apply_path: interfaces <*> unit <*> family inet address <*>
+      - name: PREFIX_MULTICAST_ALL_ROUTERS
+        prefix_list_item:
+          name: 224.0.0.2/32
+      - name: PREFIX_MULTICAST_OSPF
+        prefix_list_item:
+          - name: 224.0.0.5/32
+          - name: 224.0.0.6/32
+      - name: PREFIX_LOCAL_MGMT_IPV4
+        apply_path: interfaces <em*> unit <*> family inet address <*>
+      - name: PREFIX_LOOPBACKS_IPV4
+        apply_path: interfaces lo0 unit 0 family inet address <*>
+      - name: PREFIX_ALL
+        prefix_list_item:
+          name: 0.0.0.0/0
+      - name: PREFIX_NTP_BOOT_SERVERS
+        apply_path: system ntp boot-server <*>

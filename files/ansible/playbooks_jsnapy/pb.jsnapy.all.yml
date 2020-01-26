@@ -1,0 +1,13 @@
+---
+- name: "### RUN ALL JSNAPY TESTS"
+  hosts: all
+  gather_facts: no
+  connection: local
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - { role: juniper.junos }
+    - { role: juniper_jsnapy_mstp }
+    - { role: juniper_jsnapy_virtual_chassis }
+    - { role: juniper_jsnapy_alarms }

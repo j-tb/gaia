@@ -1,0 +1,23 @@
+{
+  "name": "string",
+  "slug": "string",
+  "status": 1,
+  "region": 0,
+  "tenant": 0,
+  "facility": "string",
+  "asn": 0,
+  "time_zone": "string",
+  "description": "string",
+  "physical_address": "string",
+  "shipping_address": "string",
+  "latitude": "string",
+  "longitude": "string",
+  "contact_name": "string",
+  "contact_phone": "string",
+  "contact_email": "user@example.com",
+  "comments": "string",
+  "tags": [
+    "string"
+  ],
+  "custom_fields": {}
+}

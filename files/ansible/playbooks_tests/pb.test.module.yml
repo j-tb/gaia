@@ -1,0 +1,84 @@
+---
+- name: "### MODULE TEST ###"
+  hosts: all
+  connection: local
+  gather_facts: no
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - juniper.junos
+  tasks:
+    ### -------------------------------------------------
+    ###    irb
+    ### -------------------------------------------------
+
+    - name: Download configuration as JSON
+      juniper_junos_config:
+        user: "{{ provider_info.user }}"
+        passwd: "{{ provider_info.passwd }}"
+        retrieve: committed
+        format: "json"
+        filter: "<interfaces><interface><name>irb</name></interface></interfaces>"
+      register: response
+
+    - name: set fact for interface irb
+      set_fact:
+        irbs: "{{ response.config_parsed.configuration.interfaces }}"
+
+    ### -------------------------------------------------
+    ###    switch options
+    ### -------------------------------------------------
+
+    - name: Download configuration as JSON
+      juniper_junos_config:
+        user: "{{ provider_info.user }}"
+        passwd: "{{ provider_info.passwd }}"
+        retrieve: committed
+        format: "json"
+        filter: "switch-options/vrf-target/auto"
+      register: response
+
+    - name: set fact for switch-options
+      set_fact:
+        vrf_import: "{{ response.config_parsed.configuration['switch-options']['vrf-target']['auto'] }}"
+
+    ### -------------------------------------------------
+    ###    vlans
+    ### -------------------------------------------------
+
+    - name: Download configuration as JSON
+      juniper_junos_config:
+        user: "{{ provider_info.user }}"
+        passwd: "{{ provider_info.passwd }}"
+        retrieve: committed
+        format: "json"
+        filter: "vlans"
+      register: response
+
+    - name: set fact for vlans
+      set_fact:
+        vlans: "{{ response.config_parsed.configuration.vlans }}"
+
+    ### -------------------------------------------------
+    ###    print all
+    ### -------------------------------------------------
+
+    - name: Debug
+      debug:
+        msg: "irbs:\n{{ irbs }}\nvlans:\n{{ vlans }}\nvrf_import:\n{{ vrf_import }}\n"
+
+    ### -------------------------------------------------
+    ###    test module
+    ### -------------------------------------------------
+    - name: test module
+      hello:
+        inventory_hostname: "{{ inventory_hostname }}"
+        vlans: "{{ vlans }}"
+        vrf_import: "{{ vrf_import }}"
+        irbs: "{{ irbs }}"
+      register: result
+
+    - name: debug
+      debug:
+        var: result

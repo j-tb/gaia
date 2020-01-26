@@ -1,0 +1,116 @@
+version: "3.3"
+services:
+  # ###############################################################
+  # # Kafka
+  # ###############################################################
+  kafka_zookeeper:
+    container_name: kelk_kafka_zookeeper
+    image: wurstmeister/zookeeper
+    ports:
+      - 2181:2181
+
+  kafka_server:
+    container_name: kelk_kafka_server
+    image: wurstmeister/kafka
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: kafka_zookeeper:2181/local
+      KAFKA_ADVERTISED_HOST_NAME: "10.255.127.5"
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_CREATE_TOPICS: "juniper:1:1,bgp_down:1:1,isis_down:1:1,isis_up:1:1"
+
+  kafka_isis_down:
+    container_name: kelk_kafka_isis_down
+    build: ${PWD}/kafka_consumers/
+    command: python3 /home/python/consumer_isis_down.py
+    volumes:
+      - ${PWD}/kafka_consumers/python:/home/python
+    depends_on:
+      - kafka_server
+      - kafka_zookeeper
+    restart: always
+
+  kafka_isis_up:
+    container_name: kelk_kafka_isis_up
+    build: ${PWD}/kafka_consumers/
+    command: python3 /home/python/consumer_isis_up.py
+    volumes:
+      - ${PWD}/kafka_consumers/python:/home/python
+    depends_on:
+      - kafka_server
+      - kafka_zookeeper
+    restart: always
+
+  kafka_bgp_down:
+    container_name: kelk_kafka_bgp_down
+    build: ${PWD}/kafka_consumers/
+    command: python3 /home/python/consumer_isis_up.py
+    volumes:
+      - ${PWD}/kafka_consumers/python:/home/python
+    depends_on:
+      - kafka_server
+      - kafka_zookeeper
+    restart: always
+
+  # ###############################################################
+  # # ELK stack
+  # ###############################################################
+  elasticsearch:
+    container_name: kelk_elasticsearch
+    build:
+      context: elasticsearch/
+    volumes:
+      - type: bind
+        source: ./elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: elasticsearch123
+
+  logstash:
+    container_name: kelk_logstash
+    build:
+      context: logstash/
+    volumes:
+      - type: bind
+        source: ./logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    ports:
+      - "5000:5000"
+      - "5514:5514"
+      - "5514:5514/udp"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    container_name: kelk_kibana
+    build:
+      context: kibana/
+    volumes:
+      - type: bind
+        source: ./kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+
+volumes:
+  elasticsearch:

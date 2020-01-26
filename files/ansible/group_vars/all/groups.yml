@@ -1,0 +1,85 @@
+configuration:
+  groups:
+    - name: GLOBAL_MTU_DEFAULTS
+      interfaces:
+        interface:
+          mtu: "9192"
+          name: <ae*>
+    - name: NETWORK_TRUNK_ALL
+      interfaces:
+        interface:
+          mtu: "9192"
+          name: <*>
+          unit:
+            family:
+              ethernet_switching:
+                interface_mode: trunk
+                vlan:
+                  members: all
+            name: "0"
+    - name: NETWORK_ACCESS_HOME
+      interfaces:
+        interface:
+          mtu: "9192"
+          name: <*>
+          unit:
+            family:
+              ethernet_switching:
+                interface_mode: access
+                vlan:
+                  members: vlan_255
+            name: "0"
+    - name: NETWORK_LACP_BOND
+      interfaces:
+        interface:
+          aggregated_ether_options:
+            lacp:
+              active: null
+              periodic: fast
+          name: <*>
+    - name: NETWORK_ACCESS_IOT
+      interfaces:
+        interface:
+          mtu: "9192"
+          name: <*>
+          unit:
+            family:
+              ethernet_switching:
+                filter:
+                  input: BLACKHOLE_FILTER
+                interface_mode: access
+                vlan:
+                  members: vlan_911
+            name: "0"
+    - name: GLOBAL_ISIS_DEFAULTS
+      protocols:
+        isis:
+          interface:
+          - hello_padding_type: disable
+            name: <ae*>
+            point_to_point: null
+          - hello_padding_type: disable
+            name: <*>
+          level:
+          - disable: null
+            name: '1'
+          - name: '2'
+            prefix_export_limit: '20000'
+            wide_metrics_only: null
+          lsp_lifetime: '65535'
+          reference_bandwidth: 1000g
+    - name: IRB_OPTIONS
+      interfaces:
+        interface:
+          name: irb
+          unit:
+            family:
+              inet:
+                address:
+                  name: <*>
+                  preferred: null
+                  primary: null
+            name: <*>
+            proxy_macip_advertisement: null
+            virtual_gateway_accept_data: null
+            virtual_gateway_v4_mac: 00:5e:5e:5e:00:01

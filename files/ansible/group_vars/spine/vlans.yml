@@ -1,0 +1,23 @@
+configuration:
+  vlans:
+    vlan:
+    - name: default
+      vlan_id: '1'
+    - description: LINUX STORAGE VLAN
+      l3_interface: irb.1046
+      name: v1046_LINUX_VLAN1
+      vlan_id: '1046'
+      vxlan:
+        vni: '11046'
+    - description: LINUX DATA VLAN
+      l3_interface: irb.1047
+      name: v1047_LINUX_VLAN2
+      vlan_id: '1047'
+      vxlan:
+        vni: '11047'
+    - description: LINUX MGMT VLAN
+      l3_interface: irb.1048
+      name: v1048_LINUX_VLAN3
+      vlan_id: '1048'
+      vxlan:
+        vni: '11048'

@@ -1,0 +1,20 @@
+---
+- name: "### Make sure devices are operational ###"
+  hosts: "{{ host_name }}"
+  roles:
+    - juniper.junos
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  connection: local
+  gather_facts: no
+  tasks:
+    ### -------------------------------------------------
+    ### PING
+    ### -------------------------------------------------
+    - name: ping route reflector
+      juniper_junos_ping:
+        dest: "{{ neighbor }}"
+        count: 10
+        acceptable_percent_loss: 10
+      register: response

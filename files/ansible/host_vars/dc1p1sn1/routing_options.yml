@@ -1,0 +1,18 @@
+configuration:
+  routing_options:
+    autonomous_system:
+      as_number: '65000.1'
+      asdot_notation: null
+    forwarding_table:
+      ecmp_fast_reroute: null
+      export: LOAD_BALANCE
+    interface_routes:
+      rib_group:
+        inet: INTERFACE_RIB
+    rib_groups:
+      import_policy: INTERFACE_IMPORT
+      import_rib:
+      - inet.0
+      - inet.3
+      name: INTERFACE_RIB
+    router_id: 192.168.255.3

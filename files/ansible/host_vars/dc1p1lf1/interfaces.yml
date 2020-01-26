@@ -1,0 +1,93 @@
+configuration:
+  interfaces:
+    apply_groups: GLOBAL_MTU_DEFAULTS
+    interface:
+      - name: xe-0/0/0
+        description: 'POD1_SPINE1_LEAF1 (Member Of: ae0)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae0
+      - name: xe-0/0/1
+        description: linux server 1 (member of ae1)
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae1
+      - name: xe-0/0/2
+        description: 'POD1_SPINE2_LEAF1 (Member Of: ae2)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae2
+      - name: xe-0/0/11
+        unit:
+          family:
+            ethernet_switching:
+              interface_mode: access
+              vlan:
+                members: v1048_LINUX_VLAN3
+          name: '0'
+      - name: ae0
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SPINE1_LEAF1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.2.1.1/31
+            iso: null
+          name: '0'
+      - name: ae1
+        aggregated_ether_options:
+          lacp:
+            active: null
+            system_id: ae:02:11:00:00:00
+        description: 'linux server 1 (Members: xe-0/0/0)'
+        esi:
+          all_active: null
+          identifier: 00:ae:02:11:00:02:00:00:00:00
+        unit:
+          family:
+            ethernet_switching:
+              interface_mode: trunk
+              vlan:
+                members: 1046-1048
+          name: '0'
+      - name: ae2
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SPINE2_LEAF1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.2.2.1/31
+            iso: null
+          name: '0'
+      - name: em0
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.255.1.21/17
+          name: '0'
+      - name: em1
+        unit:
+          family:
+            inet:
+              address:
+                name: 169.254.0.2/24
+          name: '0'
+      - name: lo0
+        unit:
+          family:
+            inet:
+              address:
+                name: 192.168.255.7/32
+            iso:
+              address:
+                name: 49.0192.0168.0255.0007.00
+          name: '0'

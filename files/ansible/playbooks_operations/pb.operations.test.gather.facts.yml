@@ -1,0 +1,19 @@
+---
+- name: "### Make sure devices are operational ###"
+  hosts: all
+  roles:
+    - juniper.junos
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  connection: local
+  gather_facts: no
+  tasks:
+    ### -------------------------------------------------
+    ### GET FACTS FROM DEVICE
+    ### -------------------------------------------------
+    - name: retrieve junos facts
+      juniper_junos_facts:
+        savedir: "{{ facts_directory }}"
+        timeout: 120
+        config_format: "set"

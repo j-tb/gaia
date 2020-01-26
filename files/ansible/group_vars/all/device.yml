@@ -1,0 +1,9 @@
+device:
+  role:
+    - switch
+  hardware:
+    family: "qfx"
+    chassis: "vqfx-10000"
+    virtual_chassis: null
+  software:
+    os_image: "18.4R1.8"

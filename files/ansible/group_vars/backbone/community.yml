@@ -1,0 +1,5 @@
+configuration:
+  policy_options:
+    community:
+      - members: target:999:999
+        name: ESI

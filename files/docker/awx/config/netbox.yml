@@ -1,0 +1,30 @@
+netbox:
+  main:
+    api_url: "http://netbox:32771/api/dcim/devices/"
+    api_token: "449b8cb0a5bbbd310a113966028999a9f593965e"
+
+  # How servers will be grouped.
+  # If no group specified here, inventory script will return all servers.
+  group_by:
+    # Default section in Netbox.
+    default:
+      - device_role
+      - rack
+      - platform
+      - tenant
+    # Custom sections (custom_fields) could be used.
+    # custom:
+    #   - product_series
+
+  # Use Netbox sections as host variables.
+  hosts_vars:
+    # Sections related to IPs e.g. "primary_ip" or "primary_ip4".
+    ip:
+      ansible_ssh_host: primary_ip
+    # Any other sections.
+    general:
+      rack_name: rack
+      config: config_context
+    custom:
+      product_series: product_series
+      os_image: os_image

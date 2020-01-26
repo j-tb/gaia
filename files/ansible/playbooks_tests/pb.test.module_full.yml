@@ -1,0 +1,99 @@
+---
+- name: "### Retrieve configuration from device, parse information, create a report and post to Netbox API ###"
+  hosts: all
+  connection: local
+  gather_facts: no
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - juniper.junos
+  tasks:
+    ### -------------------------------------------------
+    ### FULL CONFIG PULL
+    ### -------------------------------------------------
+    - name: Download configuration as JSON
+      juniper_junos_config:
+        user: "{{ provider_info.user }}"
+        passwd: "{{ provider_info.passwd }}"
+        retrieve: committed
+        format: "json"
+      register: response
+
+    - name: set fact for configuraiton
+      set_fact:
+        config: "{{ response.config_parsed.configuration }}"
+
+    ### -------------------------------------------------
+    ### ['switch-options']['vrf-target']['auto']
+    ### -------------------------------------------------
+
+    - name: set fact for switch-options
+      set_fact:
+        vrf_import: "{{ response.config_parsed.configuration['switch-options']['vrf-target']['auto'] }}"
+
+    ### -------------------------------------------------
+    ### ['vlans']
+    ### -------------------------------------------------
+
+    - name: set fact for vlans
+      set_fact:
+        vlans: "{{ response.config_parsed.configuration['vlans'] }}"
+
+    ### -------------------------------------------------
+    ### ['interfaces']
+    ### -------------------------------------------------
+
+    - name: set fact for irbs
+      set_fact:
+        irbs: "{{ response.config_parsed.configuration['interfaces'] }}"
+
+    ### -------------------------------------------------
+    ### ./library/vlan_parser.py
+    ### -------------------------------------------------
+    - name: Run configuration through our custom vlan_parser module
+      vlan_parser:
+        inventory_hostname: "{{ inventory_hostname }}"
+        vlans: "{{ vlans }}"
+        vrf_import: "{{ vrf_import }}"
+        irbs: "{{ irbs }}"
+      register: result
+
+    ### -------------------------------------------------
+    ### create report with jinja2 templating
+    ### -------------------------------------------------
+    - name: build example file
+      template:
+        src: ./templates/report_csv.j2
+        dest: ./output/report.csv
+    ### -------------------------------------------------
+    ### send data to Netbox API
+    ### -------------------------------------------------
+    # - name: Translate the output of our vlan_parser to json for netbox
+    #   set_fact:
+    #     output_json: "{{ result|to_nice_json }}"
+    # - name: Write the contents to a local file
+    #   copy:
+    #     content: "{{ output_json }}"
+    #     dest: ./output/{{ inventory_hostname }}_vlan_stretch.json
+    # - name: Find each of our device ID's from Netbox
+    #   uri:
+    #     url: "http://{{ netbox_url }}/api/dcim/devices/?name={{ inventory_hostname }}"
+    #     headers:
+    #       Authorization: "token {{ netbox_token }}"
+    #     return_content: yes
+    #   register: response
+    # - name: Setting the device_id variable based on the results of the API call above
+    #   set_fact:
+    #     device_id: "{{ response.json.results[0].id }}"
+    # - name: Update the configurations within Netbox
+    #   uri:
+    #     url: "http://{{ netbox_url }}/api/dcim/devices/{{ device_id }}/"
+    #     headers:
+    #       Authorization: "token {{ netbox_token }}"
+    #     return_content: yes
+    #     method: PATCH
+    #     body:
+    #       local_context_data: "{{ lookup('file','./output/{{ inventory_hostname }}_vlan_stretch.json') }}"
+    #     body_format: json
+    #   register: response

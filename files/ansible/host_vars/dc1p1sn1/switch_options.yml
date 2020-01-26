@@ -1,0 +1,13 @@
+configuration:
+  switch_options:
+    route_distinguisher:
+      rd_type: 192.168.255.3:999
+    vrf_import: EVPN_IMPORT
+    vrf_target:
+      auto:
+        import_as:
+          name: '65000.101'
+          vni_list: all
+      community: target:999:999
+    vtep_source_interface:
+      interface_name: lo0.0

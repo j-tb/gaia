@@ -1,0 +1,27 @@
+configuration:
+  firewall:
+    family:
+      ethernet_switching:
+        filter:
+          - name: BLACKHOLE_FILTER
+            term:
+              - name: t1
+                from:
+                  ether_type:
+                    - ipv4
+                    - ipv6
+                    - arp
+                then:
+                  discard: null
+              # - name: t2
+              #   from:
+              #     ip_protocol:
+              #       - icmp
+              #       - icmp6
+              #       - ipv6
+              #       - ospf
+              #       - pim
+              #       - tcp
+              #       - udp
+              #   then:
+              #     discard: null

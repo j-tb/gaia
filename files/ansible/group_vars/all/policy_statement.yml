@@ -1,0 +1,7 @@
+configuration:
+  policy_options:
+    policy_statement:
+      name: LOAD_BALANCE
+      then:
+        load_balance:
+          per_packet: null

@@ -1,0 +1,29 @@
+devices:
+  - host: "hoth"
+    username: "packetferret"
+    key_file: "junos_exporter_key"
+  - host: "geonosis"
+    username: "packetferret"
+    key_file: "junos_exporter_key"
+  - host: "tatooine"
+    username: "packetferret"
+    key_file: "junos_exporter_key"
+  - host: "dagobah"
+    username: "packetferret"
+    key_file: "junos_exporter_key"
+#   - host: "dantooine"
+#     username: "packetferret"
+#     key_file: "junos_exporter_key"
+
+features:
+  bgp: true
+  ospf: true
+  isis: false
+  nat: false
+  ldp: false
+  l2circuit: false
+  environment: true
+  routes: true
+  routing_engine: true
+  interface_diagnostic: true
+  fpc: true

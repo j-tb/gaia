@@ -1,0 +1,94 @@
+#jinja2: lstrip_blocks: "True (or False)", trim_blocks: "True (or False)"
+{#- ---------------------------------------------------------------------------------- #}
+{# configuration.snmp                                                                                #}
+{# ---------------------------------------------------------------------------------- -#}
+{% if configuration.snmp is defined %}
+snmp {
+    {% if configuration.snmp.interface is defined %}
+    interface {{ configuration.snmp.interface }};
+    {% endif %}
+    {# ----------------------------------------------------------------------------------- #}
+    {# configuration.snmp.community                                                                      #}
+    {# ----------------------------------------------------------------------------------- #}
+    {% if configuration.snmp.community is defined %}
+    {# ----------------------------------------------------------------------------------- #}
+    {# multiple configuration.snmp.community                                                             #}
+    {# ----------------------------------------------------------------------------------- #}
+    {% if configuration.snmp.community is not mapping and configuration.snmp.community is not string %}
+    {% for each in configuration.snmp.community %}
+    community "{{ each.name }}" {
+        {% if each.authorization is defined %}
+        authorization {{ each.authorization }};
+        {% endif %}
+        {% if each.clients is defined %}
+        clients {
+            {% if each.clients is not mapping and each.clients is not string %}
+            {% for item in each.clients %}
+            {% if item.restrict is defined %}
+            {{ item.name }} restrict;
+            {% else %}
+            {{ item }};
+            {% endif %}
+            {% endfor %}
+            {% else %}
+            {{ each.clients.name }};
+            {% endif %}
+        }
+        {% endif %}
+    }
+    {% endfor %}
+    {% else %}
+    {# ----------------------------------------------------------------------------------- #}
+    {# single configuration.snmp.community                                                               #}
+    {# ----------------------------------------------------------------------------------- #}
+    {% if configuration.snmp.community.name is defined %}
+    community "{{ configuration.snmp.community.name }}" {
+        {% if configuration.snmp.community.authorization is defined %}
+        authorization {{ configuration.snmp.community.authorization }};
+        {% endif %}
+        {% if configuration.snmp.community.clients is defined %}
+        clients {
+            {% for each in configuration.snmp.community.clients %}
+            {% if each.restrict is defined %}
+            {{ each.name }} restrict;
+            {% else %}
+            {{ each.name }};
+            {% endif %}
+            {% endfor %}
+        }
+        {% endif %}
+    }
+    {% endif %}
+    {% endif %}
+    {% endif %}
+    {% if configuration.snmp.trap_options is defined %}
+    trap-options {
+        {% if configuration.snmp.trap_options.source_address is defined %}
+        source-address {{ configuration.snmp.trap_options.source_address.address }};
+        {% endif %}
+    }
+    {% endif %}
+    {% if configuration.snmp.trap_group is defined %}
+    trap-group {{ configuration.snmp.trap_group.name }} {
+        {% if configuration.snmp.trap_group.version is defined %}
+        version {{ configuration.snmp.trap_group.version }};
+        {% endif %}
+        {% if configuration.snmp.trap_group.categories is defined %}
+        categories {
+            {% if configuration.snmp.trap_group.categories.chassis is defined %}
+            chassis;
+            {% endif %}
+            {% if configuration.snmp.trap_group.categories.routing is defined %}
+            routing;
+            {% endif %}
+        }
+        {% endif %}
+        {% if configuration.snmp.trap_group.targets is defined %}
+        targets {
+            {{ configuration.snmp.trap_group.targets.name }};
+        }
+        {% endif %}
+    }
+    {% endif %}
+}
+{% endif %}

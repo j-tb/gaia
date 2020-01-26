@@ -1,0 +1,55 @@
+configuration:
+  protocols:
+    bgp:
+      group:
+        bfd_liveness_detection:
+          minimum_interval: '2000'
+          multiplier: '3'
+          session_mode: multihop
+        family:
+          evpn:
+            signaling: null
+          inet:
+            unicast: null
+          inet_vpn:
+            unicast: null
+        log_updown: null
+        multipath: null
+        name: DC_ROUTE_REFLECTORS
+        neighbor:
+          - description: DC_RR_01
+            name: 192.168.255.101
+          - description: DC_RR_02
+            name: 192.168.255.102
+        type: internal
+    isis:
+      apply_groups: GLOBAL_ISIS_DEFAULTS
+      interface:
+        - name: ae0.0
+        - name: ae1.0
+        - name: ae2.0
+        - name: ae3.0
+        - name: lo0.0
+          passive: null
+    ldp:
+      interface:
+        - name: all
+        - disable: null
+          name: em0.0
+      track_igp_metric: null
+    lldp:
+      interface:
+        - name: all
+        - disable: null
+          name: em0
+      port_id_subtype: interface-name
+    lldp_med:
+      interface:
+        - name: all
+        - disable: null
+          name: em0
+    mpls:
+      interface:
+        - name: all
+        - disable: null
+          name: em0.0

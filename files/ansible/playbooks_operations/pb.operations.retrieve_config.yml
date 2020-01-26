@@ -1,0 +1,155 @@
+---
+- name: "### Translating a device configuration into key/value pairs"
+  hosts: home
+  connection: local
+  gather_facts: no
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - juniper.junos
+  tasks:
+    ### ------------------------------------------------------------
+    ### REMOVE AND CREATE TEMPORARY DIRECTORIES FOR FRESH BEGINNINGS
+    ### ------------------------------------------------------------
+    - name: "### Remove new temporary directories"
+      file:
+        path: "{{ backup_directory }}"
+        state: absent
+
+    - name: "### Create new temporary directories"
+      file:
+        path: "{{ backup_directory }}"
+        state: directory
+
+    ### ------------------------------------------------------------
+    ### RETRIEVE CONFIGURATION FROM NETWORK DEVICE
+    ### ------------------------------------------------------------
+    - name: "### Retrieving the configuration as XML"
+      juniper_junos_config:
+        user: "{{ provider_info.user }}"
+        # passwd: "{{ provider_info.passwd }}"
+        ssh_private_key_file: "{{ provider_info.ssh_private_key_file }}"
+        retrieve: committed
+        format: "xml"
+      register: response
+
+    - name: "### Retrieving the configuration as human readable text"
+      juniper_junos_config:
+        user: "{{ provider_info.user }}"
+        # passwd: "{{ provider_info.passwd }}"
+        ssh_private_key_file: "{{ provider_info.ssh_private_key_file }}"
+        retrieve: "committed"
+        format: text
+        diff: false
+        check: false
+        commit: false
+      register: human
+
+    ### ------------------------------------------------------------
+    ### SAVING CONFIGURATIONS AS A VARIABLE TO BE USED LATER ON
+    ### ------------------------------------------------------------
+    - name: "### REACH IN AND GRAB THE .config KEY/VALUE FROM HUMAN CONFIG"
+      set_fact:
+        human_config: "{{ human.config }}"
+
+    - name: "### Parsing the XML configuration files as JSON, storing as content"
+      set_fact:
+        content: "{{ response.config | xml_to_json }}"
+
+    - name: '### Replacing instances of "-" with "_" in JSON keys'
+      set_fact:
+        clean_json: "{{ content | hyphen_to_underscore }}"
+
+    - name: "### Translate the JSON data to YAML"
+      set_fact:
+        clean_yaml: "{{ clean_json | to_nice_yaml(indent=2, width=1337) }}"
+
+    ### ------------------------------------------------------------
+    ### WRITING CONFIGURATIONS TO FILES
+    ### ------------------------------------------------------------
+    - name: "### Writing human readable configuration as a file for backup"
+      local_action:
+        module: copy
+        content: "{{ human_config }}"
+        dest: "backup/{{ inventory_hostname }}/{{ inventory_hostname }}.conf"
+
+    - name: "### Writing JSON as a file for backup"
+      local_action:
+        module: copy
+        content: "{{ clean_json }}"
+        dest: "backup/{{ inventory_hostname }}/{{ inventory_hostname }}.json"
+
+    - name: "### Writing YAML as a file for backup"
+      local_action:
+        module: copy
+        content: "{{ clean_yaml }}"
+        dest: "backup/{{ inventory_hostname }}/{{ inventory_hostname }}.yaml"
+
+    ### ------------------------------------------------------------
+    ### COPY OVER THE DEVICE'S CONFIGURATION YAML FILE TO host_vars
+    ### ------------------------------------------------------------
+    - name: "### Ensure that host_vars/{{ inventory_hostname }} exists"
+      file:
+        path: "{{ host_vars_directory }}"
+        state: directory
+
+    - name: "### Copy YAML file to host_vars"
+      local_action:
+        module: copy
+        content: "{{ clean_yaml }}"
+        dest: "{{ host_vars_directory }}/all.yaml"
+
+    ### ------------------------------------------------------------
+    ### MANIPULATING OBJECTS TO BEND TO OUR WILL
+    ### ------------------------------------------------------------
+    # - name: '### Translating clean_yaml from text object to dictionary'
+    #   set_fact:
+    #     output: "{{ clean_yaml | from_yaml }}"
+
+    # - name: '### Storing the chassis configuration as object chassis'
+    #   set_fact:
+    #     chassis: '{{ output.configuration.chassis }}'
+
+    # - name: '### Writting chassis configuration as YAML'
+    #   local_action:
+    #     module: copy
+    #     content: "chassis:\n  {{ chassis | to_nice_yaml(width=1337) }}"
+    #     dest: "backup/{{ inventory_hostname }}/chassis.yaml"
+
+    # - name: '### Storing the interfaces configuration as object iface'
+    #   set_fact:
+    #     iface: '{{ output.configuration.interfaces }}'
+
+    # - name: '### Writting interfaces configuration as YAML'
+    #   local_action:
+    #     module: copy
+    #     content: "interfaces:\n  {{ interfaces | to_nice_yaml(width=1337) }}"
+    #     dest: "backup/{{ inventory_hostname }}/interfaces.yaml"
+
+    ### ------------------------------------------------------------
+    ### NETBOX WORK
+    ### ------------------------------------------------------------
+    - name: Find each of our device ID's from Netbox
+      uri:
+        url: "http://{{ netbox_url }}/api/dcim/devices/?name={{ inventory_hostname }}"
+        headers:
+          Authorization: "token {{ netbox_token }}"
+        return_content: yes
+      register: response
+
+    - name: Setting the device_id variable based on the results of the API call above
+      set_fact:
+        device_id: "{{ response.json.results[0].id }}"
+
+    - name: Update the configurations within Netbox
+      uri:
+        url: "http://{{ netbox_url }}/api/dcim/devices/{{ device_id }}/"
+        headers:
+          Authorization: "token {{ netbox_token }}"
+        return_content: yes
+        method: PATCH
+        body:
+          local_context_data: "{{ lookup('file','backup/{{ inventory_hostname }}/{{ inventory_hostname }}.json') }}"
+        body_format: json
+      register: response

@@ -1,0 +1,11 @@
+---
+- name: MSTP healthcheck with JSNAPy
+  hosts: all
+  gather_facts: no
+  connection: local
+  vars_files:
+    - "shared/variables.yml"
+    - "shared/secrets.yml"
+  roles:
+    - { role: juniper.junos }
+    - { role: juniper_jsnapy_mstp }

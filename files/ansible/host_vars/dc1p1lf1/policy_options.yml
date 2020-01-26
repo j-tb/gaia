@@ -1,0 +1,17 @@
+configuration:
+  policy_options:
+    community:
+      members: target:999:999
+      name: ESI
+    policy_statement:
+      - name: EVPN-IMPORT
+        term:
+          from:
+            community: ESI
+          name: EVPN-ROUTES
+          then:
+            accept: null
+      - name: LOAD_BALANCE
+        then:
+          load_balance:
+            per_packet: null

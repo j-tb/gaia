@@ -1,0 +1,11 @@
+configuration:
+  policy_options:
+    community:
+      - members: target:999:999
+        name: ESI
+      - members: target:65100:100
+        name: GEN_IP_VRF_RT
+      - members: target:1000:1000
+        name: TRUSTED_COMMUNITY
+      - members: target:1766:2
+        name: VRF02_RT

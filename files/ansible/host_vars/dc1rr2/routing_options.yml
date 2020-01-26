@@ -1,0 +1,15 @@
+configuration:
+  routing_options:
+    autonomous_system:
+      as_number: '65000.1'
+      asdot_notation: null
+    forwarding_table:
+      ecmp_fast_reroute: null
+      export: LOAD_BALANCE
+    rib:
+      name: inet.3
+      static:
+        route:
+          discard: null
+          name: 0.0.0.0/0
+    router_id: 192.168.255.102

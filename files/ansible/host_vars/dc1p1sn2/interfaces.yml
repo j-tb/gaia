@@ -1,0 +1,101 @@
+configuration:
+  interfaces:
+    interface:
+      - name: xe-0/0/0
+        description: 'POD1_SERVICENODE1_BACKBONE1 (Member Of: ae0)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae0
+      - name: xe-0/0/1
+        description: 'POD1_SERVICENODE1_SPINE1 (Member Of: ae1)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae1
+      - name: xe-0/0/2
+        description: 'POD1_SERVICENODE1_BACKBONE2 (Member Of: ae2)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae2
+      - name: xe-0/0/3
+        description: 'POD1_SERVICENODE1_SPINE2 (Member Of: ae3)'
+        ether_options:
+          ieee_802.3ad:
+            bundle: ae3
+      - name: ae0
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SERVICENODE2_BACKBONE2
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.0.2.1/31
+            iso: null
+            mpls: null
+          name: '0'
+      - name: ae1
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SERVICENODE2_SPINE2
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.1.2.2/31
+            mpls: null
+          name: '0'
+      - name: ae2
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SERVICENODE2_BACKBONE1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.0.1.3/31
+            iso: null
+            mpls: null
+          name: '0'
+      - name: ae3
+        aggregated_ether_options:
+          lacp:
+            active: null
+            periodic: fast
+        description: POD1_SERVICENODE2_SPINE1
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.1.2.0/31
+            mpls: null
+          name: '0'
+      - name: em0
+        unit:
+          family:
+            inet:
+              address:
+                name: 10.255.1.36/17
+          name: '0'
+      - name: em1
+        unit:
+          family:
+            inet:
+              address:
+                name: 169.254.0.2/24
+          name: '0'
+      - name: lo0
+        unit:
+          family:
+            inet:
+              address:
+                name: 192.168.255.4/32
+            iso:
+              address:
+                name: 49.0192.0168.0255.0004.00
+          name: '0'
