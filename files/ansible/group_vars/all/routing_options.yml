@@ -1,0 +1,14 @@
+configuration:
+  routing_options:
+    bmp:
+      station:
+        - name: openbmp
+          initiation_message: "Development/LAB"
+          local_address: "{{ ansible_host }}"
+          connection_mode: active
+          monitor: enable
+          route_monitoring: 
+            pre_policy: null
+          station_address: 10.255.127.21
+          station_port: 5000
+          statistics_timeout: 300

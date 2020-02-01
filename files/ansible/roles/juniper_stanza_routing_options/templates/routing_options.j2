@@ -5,6 +5,33 @@
 {% if configuration.routing_options is defined %}
 routing-options {
     {# ----------------------------------------------------------------------------------- #}
+    {# bmp                                                                                 #}
+    {# ----------------------------------------------------------------------------------- #}
+    {% if configuration.routing_options.bmp is defined %}
+    bmp {
+        {% if configuration.routing_options.bmp.station is defined %}
+        {% for each in configuration.routing_options.bmp.station %}
+        station {{ each.name }} {
+            initiation-message {{ each.initiation_message }};
+            local-address {{ each.local_address }};
+            connection-mode {{ each.connection_mode }};
+            monitor {{ each.monitor }};
+            {% if each.route_monitoring is defined %}
+            route-monitoring {
+                {% if each.route_monitoring.pre_policy is defined %}
+                pre-policy;
+                {% endif %}
+            }
+            {% endif %}
+            station-address {{ each.station_address }};
+            station-port {{ each.station_port }};
+            statistics-timeout {{ each.statistics_timeout }};
+        }
+        {% endfor %}
+        {% endif %}
+    }
+    {% endif %}
+    {# ----------------------------------------------------------------------------------- #}
     {# rib                                                                                 #}
     {# ----------------------------------------------------------------------------------- #}
     {% if configuration.routing_options.rib is defined %}
