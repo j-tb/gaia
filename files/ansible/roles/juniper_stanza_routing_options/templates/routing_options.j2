@@ -12,7 +12,7 @@ routing-options {
         {% if configuration.routing_options.bmp.station is defined %}
         {% for each in configuration.routing_options.bmp.station %}
         station {{ each.name }} {
-            initiation-message {{ each.initiation_message }};
+            initiation-message {{ inventory_hostname }};
             local-address {{ each.local_address }};
             connection-mode {{ each.connection_mode }};
             monitor {{ each.monitor }};
