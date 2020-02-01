@@ -71,88 +71,6 @@ system {
         encrypted-password "{{ configuration.system.root_authentication.encrypted_password }}";
     }
     {% endif %}
-    {#- ---------------------------------------------------------------------------------- #}
-    {# configuration.system.service                                                        #}
-    {# ---------------------------------------------------------------------------------- -#}
-    {% if configuration.version is defined and configuration.version == "18.4R3.3" %}
-    {% if configuration.system.services is defined %}
-    services {
-        {% if configuration.system.services.ftp is defined %}
-        ftp;
-        {% endif %}
-        {% if configuration.system.services.ssh is defined %}
-        ssh {
-            {% if configuration.system.services.ssh.root_login is defined %}
-            root-login allow;
-            {% endif %}
-            {% if configuration.system.services.ssh.protocol_version is defined %}
-            protocol-version {{ configuration.system.services.ssh.protocol_version }};
-            {% endif %}
-            {% if configuration.system.services.ssh.max_sessions_per_connection is defined %}
-            max-sessions-per-connection {{ configuration.system.services.ssh.max_sessions_per_connection }};
-            {% endif %}
-            {% if configuration.system.services.ssh.connection_limit is defined %}
-            connection-limit {{ configuration.system.services.ssh.connection_limit }};
-            {% endif %}
-            {% if configuration.system.services.ssh.rate_limit is defined %}
-            rate-limit {{ configuration.system.services.ssh.rate_limit }};
-            {% endif %}
-        }
-        {% endif %}
-        {% if configuration.system.services.netconf is defined %}
-        netconf {
-            {% if configuration.system.services.netconf.ssh is defined %}
-            ssh;
-            {% endif %}
-        }
-        {% endif %}
-        {% if configuration.system.services.rest is defined %}
-        rest {
-            {% if configuration.system.services.rest.http is defined %}
-            http {
-                {% if configuration.system.services.rest.http.port is defined %}
-                port {{ configuration.system.services.rest.http.port }};
-                {% endif %}
-                {% if configuration.system.services.rest.http.addresses is defined %}
-                addresses {{ configuration.system.services.rest.http.addresses }};
-                {% endif %}
-            }
-            {% endif %}
-            {% if configuration.system.services.rest.enable_explorer is defined %}
-            enable-explorer;
-            {% endif %}
-        }
-        {% endif %}
-        {% if configuration.system.services.dhcp_local_server is defined %}
-        dhcp-local-server {
-            {% if configuration.system.services.dhcp_local_server.group is defined %}
-            {% for each in configuration.system.services.dhcp_local_server.group %}
-            group {{ each.name }} {
-                {% for iface in each.interface %}
-                interface {{ iface.name }};
-                {% endfor %}
-            }
-            {% endfor %}
-            {% endif %}
-        }
-        {% endif %}
-        {% if configuration.system.services.web_management is defined %}
-        web-management {
-            {% if configuration.system.services.web_management.http is defined %}
-            http {
-                {% if configuration.system.services.web_management.http.interface is defined %}
-                interface {{ configuration.system.services.web_management.http.interface }};
-                {% endif %}
-                {% if configuration.system.services.web_management.http.port is defined %}
-                port {{ configuration.system.services.web_management.http.port }};
-                {% endif %}
-            }
-            {% endif %}
-        }
-        {% endif %}
-    }
-    {% endif %}
-    {% endif %}
     {% if configuration.system.host_name is defined %}
     host-name {{ configuration.system.host_name }};
     {% endif %}
@@ -322,7 +240,6 @@ system {
     {#- ---------------------------------------------------------------------------------- #}
     {# configuration.system.service                                                        #}
     {# ---------------------------------------------------------------------------------- -#}
-    {% if configuration.version is defined and configuration.version != "18.4R3.3" %}
     {% if configuration.system.services is defined %}
     services {
         {% if configuration.system.services.ftp is defined %}
@@ -347,6 +264,9 @@ system {
             {% endif %}
         }
         {% endif %}
+        {#- ---------------------------------------------------------------------------------- #}
+        {# netconf                                                                             #}
+        {# ---------------------------------------------------------------------------------- -#}
         {% if configuration.system.services.netconf is defined %}
         netconf {
             {% if configuration.system.services.netconf.ssh is defined %}
@@ -354,6 +274,36 @@ system {
             {% endif %}
         }
         {% endif %}
+        {#- ---------------------------------------------------------------------------------- #}
+        {# outbound_ssh                                                                                #}
+        {# ---------------------------------------------------------------------------------- -#}
+        {% if configuration.system.services.outbound_ssh is defined %}
+        outbound-ssh {
+            {% if configuration.system.services.outbound_ssh.client is defined %}
+            {% for each in configuration.system.services.outbound_ssh.client %}
+            client {{ each.name }} {
+                device-id {{ each.device_id }};
+                secret {{ each.secret }};
+                keep-alive {
+                    retry {{ each.keep_alive.retry }};
+                    timeout {{ each.keep_alive.timeout }};
+                }
+                services {{ each.services }};
+                {% for server in each.servers %}
+                {{ server.name }} {
+                    port {{ server.port }};
+                    retry {{ server.retry }};
+                    timeout {{ server.timeout }};
+                }
+                {% endfor %}
+            }
+            {% endfor %}
+            {% endif %}
+        }
+        {% endif %}
+        {#- ---------------------------------------------------------------------------------- #}
+        {# rest                                                                                #}
+        {# ---------------------------------------------------------------------------------- -#}
         {% if configuration.system.services.rest is defined %}
         rest {
             {% if configuration.system.services.rest.http is defined %}
@@ -399,7 +349,6 @@ system {
         }
         {% endif %}
     }
-    {% endif %}
     {% endif %}
     {% if configuration.system.syslog is defined %}
     syslog {

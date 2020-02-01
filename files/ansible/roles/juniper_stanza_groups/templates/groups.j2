@@ -37,11 +37,11 @@ groups {
                     {% if each.interfaces.interface.unit.family.inet is defined %}
                     family inet {
                         address {{ each.interfaces.interface.unit.family.inet.address.name }} {
-                            {% if each.interfaces.interface.unit.family.inet.address.preferred is defined %}
-                            preferred;
-                            {% endif %}
                             {% if each.interfaces.interface.unit.family.inet.address.primary is defined %}
                             primary;
+                            {% endif %}
+                            {% if each.interfaces.interface.unit.family.inet.address.preferred is defined %}
+                            preferred;
                             {% endif %}
                         }
                     }

@@ -61,10 +61,10 @@ policy-options {
         {% if each.term is defined %}
         term {{ each.term.name }} {
             {% if each.term.from is defined %}
-            {# ----------------------------------------------- #}
-            {# catch those with multiple keys in the from term #}
-            {# ----------------------------------------------- #}
             from {
+                {# ----------------------------------------------- #}
+                {# from route filter                               #}
+                {# ----------------------------------------------- #}
                 {% if each.term.from.route_filter is defined %}
                 {% if each.term.from.route_filter is not mapping and each.term.from.route_filter is not string %}
                 {% for item in each.term.from.route_filter %}
@@ -82,6 +82,19 @@ policy-options {
                 {% endif %}
                 {% endif %}
                 {% endif %}
+                {# ----------------------------------------------- #}
+                {# from protocol                                  #}
+                {# ----------------------------------------------- #}
+                {% if each.term.from.protocol is defined %}
+                {% if each.term.from.protocol is not mapping and each.term.from.protocol is not string %}
+                protocol [ {{ each.term.from.protocol|join(' ') }} ];
+                {% else %}
+                protocol {{ each.term.from.protocol }};
+                {% endif %}
+                {% endif %}
+                {# ----------------------------------------------- #}
+                {# from community                                  #}
+                {# ----------------------------------------------- #}
                 {% if each.term.from.community is defined %}
                 {% if each.term.from.community is not mapping and each.term.from.community is not string %}
                 community [ {{ each.term.from.community|join(' ') }} ];
@@ -90,7 +103,7 @@ policy-options {
                 {% endif %}
                 {% endif %}
                 {# ----------------------------------------------- #}
-                {# policy-options.policy-statements.term.from.rib  #}
+                {# from rib                                        #}
                 {# ----------------------------------------------- #}
                 {% if each.term.from.rib is defined %}
                 {% if each.term.from.rib is not mapping and each.term.from.rib is not string %}
@@ -99,9 +112,9 @@ policy-options {
                 rib {{ each.term.from.rib }};
                 {% endif %}
                 {% endif %}
-                {# ------------------------------------------------------ #}
-                {# policy-options.policy-statements.term.from.route_type  #}
-                {# ------------------------------------------------------ #}
+                {# ----------------------------------------------- #}
+                {# from route type                                 #}
+                {# ----------------------------------------------- #}
                 {% if each.term.from.route_type is defined %}
                 {% if each.term.from.route_type is not mapping and each.term.from.route_type is not string %}
                 route-type [ {{ each.term.from.route_type|join(' ') }} ];
@@ -166,6 +179,9 @@ policy-options {
         from {
             {% if each.from.prefix_list is defined %}
             prefix-list {{ each.from.prefix_list.name }};
+            {% endif %}
+            {% if each.from.protocol is defined %}
+            protocol {{ each.from.protocol }};
             {% endif %}
         }
         {% endif %}
